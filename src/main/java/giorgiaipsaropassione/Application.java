@@ -55,30 +55,36 @@ public class Application {
         }
 
         System.out.println("Numero di pubblicazioni nel catalogo prima dell'eliminazione: " + catalogo.size());
-
         catalogo.forEach(element -> System.out.println(element.toString()));
 
         // CHIAMATA PER ELIMINARE LIBRO TRAMITE SCANNER CON RICHIESTA INSERIMENTO ISBN
 
         eliminaLibro(catalogo);
 
-        
         System.out.println("Numero di pubblicazioni nel catalogo dopo l'eliminazione: " + catalogo.size());
-
-        // Mostra il catalogo dopo la possibile eliminazione
         catalogo.forEach(element -> System.out.println(element.toString()));
+
+        // CHIAMATA PER CARCARE LIBRO O RIVISTA TRAMITE SCANNER E RICHIESTA INSERIMENDO ISBN
+        cercaPubblicazione(catalogo);
     }
+    //QUI APPLICO UN METODO RANDOM PER RANDOMIZZARE LA CREAZIONE DI LIBRI E RIVISTE (25 e 25)
 
     private static Libro genRandomBook() {
         Faker faker = new Faker();
         Random rnd = new Random();
 
+        //RANDOM DI TITOLO E AUTORE E CODICE IBSN DI LUNGHEZZA 11 CIFRE
         long codiceIsbn = faker.number().randomNumber(11, true);
         String title = faker.book().title();
-        LocalDate annoPubblicazione = LocalDate.of(rnd.nextInt(2024 - 1980) + 1980, rnd.nextInt(12) + 1, rnd.nextInt(28) + 1);
-        int numPagine = rnd.nextInt((500) + 100);
         String autore = faker.book().author();
 
+        //RANDOM DI DATE (intervallo tra 2024-1980)
+        LocalDate annoPubblicazione = LocalDate.of(rnd.nextInt(2024 - 1980) + 1980, rnd.nextInt(12) + 1, rnd.nextInt(28) + 1);
+
+        //RANDOM NUM DI PAGINE
+        int numPagine = rnd.nextInt((500) + 100);
+
+        //RANDOM PER IL GENERE
         Genere[] generi = Genere.values();
         Genere genere = generi[rnd.nextInt(generi.length)];
 
@@ -89,17 +95,25 @@ public class Application {
         Faker faker = new Faker();
         Random rnd = new Random();
 
+        //RANDOM DI CODICE IBSN E TITOlO
         long codiceIsbn = faker.number().randomNumber(11, true);
         String title = faker.book().title();
+
+        //RANDOM DI DATE (intervallo tra 2024-1980)
         LocalDate annoPubblicazione = LocalDate.of(rnd.nextInt(2024 - 1980) + 1980, rnd.nextInt(12) + 1, rnd.nextInt(28) + 1);
+
+        //RANDOM NUM DI PAGINE
         int numPagine = rnd.nextInt((500) + 100);
 
+        //RANDOM DELL'ENUM PERIODICITA'
         Periodicita[] periodi = Periodicita.values();
         Periodicita periodicita = periodi[rnd.nextInt(periodi.length)];
 
         return new Rivista(codiceIsbn, title, annoPubblicazione, numPagine, periodicita);
     }
-    // Eliminazione libro tramite scanner e ISBN
+
+
+    // ELIMINAZIONE LIBRO O RIVISTA TRAMITE SCANNER CON RICHIESTA DI INSERIMENTO ISBN
 
     private static void eliminaLibro(Set<Pubblicazione> catalogo) {
         Scanner scanner = new Scanner(System.in);
@@ -122,5 +136,24 @@ public class Application {
         }
     }
 
+    //METODO PER LA RICERCA DI UN ELEMENTO LIBRO O RIVISTA TRAMITE LA RICHIESTA DI UN ISBN SPECIFICO
+
+    private static void cercaPubblicazione(Set<Pubblicazione> catalogo) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Inserisci l'ISBN del libro o rivista da cercare: ");
+        long isbnDaCercare = scanner.nextLong();
+
+        for (Pubblicazione pubblicazione : catalogo) {
+            if (pubblicazione instanceof Libro && ((Libro) pubblicazione).getCodiceIsbn() == isbnDaCercare) {
+                System.out.println("Libro trovato: " + pubblicazione.toString());
+                return;
+            } else if (pubblicazione instanceof Rivista && ((Rivista) pubblicazione).getCodiceIsbn() == isbnDaCercare) {
+                System.out.println("Rivista trovata: " + pubblicazione.toString());
+                return;
+            }
+        }
+
+        System.out.println("Nessun libro o rivista trovato con ISBN " + isbnDaCercare);
+    }
 
 }
