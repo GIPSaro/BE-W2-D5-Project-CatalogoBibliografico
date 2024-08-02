@@ -71,6 +71,9 @@ public class Application {
 
         //CHIAMATA PER CERCARE LIBRO O RIVISTRA TRAMITE ANNO DI PUBBLICAZIONE
         cercaPubblicazionePerAnno(catalogo);
+
+        // CHIAMATA PER CERCARE LIBRO TRAMITE AUTORE
+        cercaPubblicazionePerAutore(catalogo);
     }
     //QUI APPLICO UN METODO RANDOM PER RANDOMIZZARE LA CREAZIONE DI LIBRI E RIVISTE (25 e 25)
 
@@ -191,6 +194,24 @@ public class Application {
 
         if (!trovata) {
             System.out.println("Nessuna pubblicazione trovata per l'anno " + annoDaCercare);
+        }
+    }
+
+    private static void cercaPubblicazionePerAutore(Set<Pubblicazione> catalogo) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Inserisci il nome dell'autore del libro o rivista da cercare: ");
+        String autoreDaCercare = scanner.nextLine();
+
+        boolean trovata = false;
+        for (Pubblicazione pubblicazione : catalogo) {
+            if (pubblicazione instanceof Libro && ((Libro) pubblicazione).getAutore().equalsIgnoreCase(autoreDaCercare)) {
+                System.out.println("Libro trovato: " + pubblicazione);
+                trovata = true;
+            }
+        }
+
+        if (!trovata) {
+            System.out.println("Nessun libro o rivista trovato con autore " + autoreDaCercare);
         }
     }
 }
