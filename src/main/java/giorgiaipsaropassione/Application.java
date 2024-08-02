@@ -2,6 +2,9 @@ package giorgiaipsaropassione;
 
 import com.github.javafaker.Faker;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -13,7 +16,7 @@ import java.util.Set;
 
 public class Application {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         Set<Pubblicazione> catalogo = new HashSet<>();
 
         System.out.println("-------------Creazione Random di Libri e Riviste-----------------");
@@ -74,6 +77,11 @@ public class Application {
 
         // CHIAMATA PER CERCARE LIBRO TRAMITE AUTORE
         cercaPubblicazionePerAutore(catalogo);
+
+        //CHIAMATA PER LEGGERE E SALVARE SU DISCO
+        salvaSuDisco(catalogo);
+        System.out.println(leggereFile());
+
     }
     //QUI APPLICO UN METODO RANDOM PER RANDOMIZZARE LA CREAZIONE DI LIBRI E RIVISTE (25 e 25)
 
@@ -164,7 +172,7 @@ public class Application {
         System.out.println("Nessun libro o rivista trovato con ISBN " + isbnDaCercare);
     }
 
-    //METODO PER CARCARE UN LIBRO UNA RIVISTRA TRAMITE ANNO DI PUBBLICAZIONE
+    //METODO PER CARCARE UN LIBRO O UNA RIVISTRA TRAMITE ANNO DI PUBBLICAZIONE
 
     private static void cercaPubblicazionePerAnno(Set<Pubblicazione> catalogo) {
         Scanner scanner = new Scanner(System.in);
@@ -214,4 +222,54 @@ public class Application {
             System.out.println("Nessun libro o rivista trovato con autore " + autoreDaCercare);
         }
     }
+
+    // METODO PER SCRIVERE SU DISCO
+    public static void salvaSuDisco(Set<Pubblicazione> catalogo) {
+        File file = new File("Catalogo.txt");
+        try (FileWriter writer = new FileWriter(file)) {
+            for (Pubblicazione pubblicazione : catalogo) {
+                writer.write(pubblicazione.toString() + "\n");
+            }
+            System.out.println("Catalogo salvato su disco con successo.");
+            System.out.println("Il catalogo è di lunghezza: " + catalogo.size());
+        } catch (IOException e) {
+            System.err.println("Errore durante il salvataggio del catalogo: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+
+    // METODO PER LEGGERE DA DISCO
+    public static Set<Pubblicazione> leggereFile() {
+        Set<Pubblicazione> catalogo = new HashSet<>();
+        File file = new File("Catalogo.txt");
+        try (Scanner scanner = new Scanner(file)) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                try {
+                    if (line.startsWith("ISBN: ")) {
+                        String[] parts = line.split(" - ");
+                        if (parts.length > 1) {
+                            String type = parts[0].split(": ")[0];
+                            if (type.equals("ISBN")) {
+                                if (parts[4].contains("Periodico")) {
+                                    catalogo.add(Rivista.fromString(line));
+                                } else {
+                                    catalogo.add(Libro.fromString(line));
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    System.err.println("Errore nel parsing della linea: " + line + " - " + e.getMessage());
+                }
+            }
+            System.out.println("Catalogo letto dal disco con successo.");
+            System.out.println("Il catalogo è di lunghezza: " + catalogo.size());
+        } catch (IOException e) {
+            System.err.println("Errore durante la lettura del catalogo: " + e.getMessage());
+        }
+        return catalogo;
+    }
+
 }
