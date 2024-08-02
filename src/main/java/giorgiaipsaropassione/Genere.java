@@ -1,0 +1,5 @@
+package giorgiaipsaropassione;
+
+public enum Genere {
+    ROMANZO, STORIA, FANTASY, ARTE, HORROR, TRHILLER, POLIZIESCO, BIBLIOGRAFICO, AUTOBIOGRAFICO
+}
